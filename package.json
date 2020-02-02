@@ -1,7 +1,7 @@
 {
   "name": "pco-backup",
   "version": "1.0.0",
-  "description": "Program to backup dato from Planning Center Online",
+  "description": "Program to backup data from PCO Songs",
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js"
