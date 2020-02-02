@@ -1,0 +1,15 @@
+{
+  "name": "pco-backup",
+  "version": "1.0.0",
+  "description": "Program to backup data from PCO Songs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "author": "Isaac Heist",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "puppeteer": "^2.1.0"
+  }
+}
