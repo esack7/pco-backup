@@ -8,13 +8,13 @@ const loginURL = process.env.LOGINURL;
 
 module.exports = async function () {
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const pages = await browser.pages();
-    console.log("Starting Puppeteer\n");
+
+    process.stdout.write(`Logging in.\n`)
+
     const page = pages[0];
     await page.goto(loginURL, { waitUntil: "domcontentloaded" });
-
-    console.log("Loading Page\n");
 
     await page.type("#email", username);
     await page.type("#password", password);
@@ -25,7 +25,6 @@ module.exports = async function () {
 
     if (currentURL === loginURL) {
       let nameOptions = [];
-      let urlOptions = [];
       let selection = '';
       let selectNum = 0;
       let listOptions = await page.$$('.f-1');
@@ -34,12 +33,10 @@ module.exports = async function () {
       for (i = 0; i < listOptions.length; i++) {
         let name = await page.evaluate(listItem => listItem.text, listOptions[i])
         nameOptions.push(name);
-        let url = await page.evaluate(listItem => listItem.href, listOptions[i])
-        urlOptions.push(url);
       }
-      await Promise.all(nameOptions, urlOptions);
+      await Promise.all(nameOptions);
 
-      process.stdout.write(`Which account would you like to loggin to:\n`);
+      process.stdout.write(`Which account would you like to log in to:\n`);
       for (i = 0; i < nameOptions.length; i++) {
         process.stdout.write(`\t${i + 1}. ${nameOptions[i]}\n`);
       }
@@ -54,7 +51,10 @@ module.exports = async function () {
     }
     await page.waitForNavigation();
     cookies = await page.cookies();
+
     console.log("Here are the cookies:\n", cookies);
+
+    //TODO: Persist cookies for use later and return auth as a Promise.
 
   } catch (error) {
     console.error("Here is the error:\n", error);
