@@ -1,5 +1,5 @@
 const puppeteer = require("puppeteer");
-const { readSelection } = require('./utils.js')
+const { readSelection, writeToFile } = require('./utils.js')
 require("dotenv").config();
 
 const username = process.env.USRNAME;
@@ -8,7 +8,7 @@ const loginURL = process.env.LOGINURL;
 
 module.exports = async function () {
   try {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const pages = await browser.pages();
 
     process.stdout.write(`Logging in.\n`)
@@ -46,16 +46,19 @@ module.exports = async function () {
       selectNum = parseInt(selection);
 
       //TODO: Add validation.
-
       await page.click(`li:nth-child(${selectNum}) > span > a.f-1`);
+      process.stdout.write(`Awaiting navigation to main page for ${nameOptions[selectNum - 1]}\n`)
     }
     await page.waitForNavigation();
+    await page.click(`div.simple > a:nth-child(7)`);
+    process.stdout.write(`Awaiting navigation to songs page to collect cookies\n`)
+    await page.waitForNavigation();
+    
     cookies = await page.cookies();
+    process.stdout.write(`Cookies collected\n`);
 
-    console.log("Here are the cookies:\n", cookies);
-
-    //TODO: Persist cookies for use later and return auth as a Promise.
-
+    await writeToFile(cookies, 'cookies');
+    return null;
   } catch (error) {
     console.error("Here is the error:\n", error);
   }
