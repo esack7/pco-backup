@@ -50,16 +50,19 @@ module.exports = async function () {
       process.stdout.write(`Awaiting navigation to main page for ${nameOptions[selectNum - 1]}\n`)
     }
     await page.waitForNavigation();
-    await page.click(`div.simple > a:nth-child(7)`);
-    process.stdout.write(`Awaiting navigation to songs page to collect cookies\n`)
-    await page.waitForNavigation();
-    
+    process.stdout.write(`Collecting all cookies`);
+    await page.waitFor(300);
+    process.stdout.write(` .`);
+    await page.waitFor(300);
+    process.stdout.write(` .`);
+    await page.waitFor(300);
+    process.stdout.write(` .`);
+    await page.waitFor(300);
     cookies = await page.cookies();
-    process.stdout.write(`Cookies collected\n`);
-
+    process.stdout.write(`Cookies collected!\n`);
     await writeToFile(cookies, 'cookies');
     return null;
   } catch (error) {
-    console.error("Here is the error:\n", error);
+    console.error("There has been an error in auth.js\nHere is the error:\n", error);
   }
 };
