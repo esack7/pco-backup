@@ -110,4 +110,7 @@ dist/
 tmp/
 temp/
 
+# Project specific files
+cookies.json
+
 # End of https://www.gitignore.io/api/node,dotenv
