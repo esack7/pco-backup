@@ -59,7 +59,8 @@ module.exports = async function () {
     process.stdout.write(` .`);
     await page.waitFor(300);
     cookies = await page.cookies();
-    process.stdout.write(`Cookies collected!\n`);
+    await page.waitFor(1000);
+    process.stdout.write(` Cookies collected!\n`);
     await writeToFile(cookies, 'cookies');
     return null;
   } catch (error) {

@@ -112,5 +112,5 @@ temp/
 
 # Project specific files
 cookies.json
-
+*savedData.json
 # End of https://www.gitignore.io/api/node,dotenv
