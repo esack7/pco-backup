@@ -2,16 +2,20 @@
   "name": "pco-backup",
   "version": "1.0.0",
   "description": "Program to backup data from PCO Songs",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "start": "node ./index.js"
+    "build": "tsc",
+    "start": "node ./dist/index.js"
   },
   "author": "Isaac Heist",
   "license": "MIT",
   "dependencies": {
-    "date-fns": "^2.9.0",
-    "dotenv": "^8.2.0",
-    "puppeteer": "^2.1.0",
-    "superagent": "^5.2.1"
+    "date-fns": "^2.28.0",
+    "dotenv": "^16.0.1",
+    "puppeteer": "^15.3.0",
+    "superagent": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/superagent": "^4.1.15"
   }
 }
