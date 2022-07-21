@@ -13,9 +13,11 @@
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.1",
     "puppeteer": "^15.3.0",
+    "sqlite3": "^5.0.9",
     "superagent": "^8.0.0"
   },
   "devDependencies": {
+    "@types/sqlite3": "^3.1.8",
     "@types/superagent": "^4.1.15"
   }
 }

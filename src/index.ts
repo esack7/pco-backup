@@ -9,6 +9,7 @@ import { differenceInSeconds } from "date-fns";
 import "dotenv/config";
 import SavedSongs from "./classes/SavedSongs";
 import SavedSong from "./classes/SavedSong";
+import { InitializeDB } from "./database/database";
 
 const apiUrl = process.env.APIURL;
 const timeStart = Date.now();
@@ -37,7 +38,7 @@ async function main() {
         mainVariables.cookieString =
           mainVariables.cookieString + `${ele.name}=${ele.value};`;
       });
-
+      InitializeDB();
       process.stdout.write("Requesting songs ...\n");
       let res = JSON.parse(
         await makeGetRequest(apiUrl, mainVariables)
