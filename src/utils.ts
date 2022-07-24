@@ -61,7 +61,7 @@ export function makeGetRequest(postURL: string, mainVariables: MainVariables) {
       });
   });
 }
-export function cookiesExist(path: string) {
+export function fileExists(path: string) {
   return new Promise<boolean>((resolve, reject) => {
     access(path, constants.F_OK, (err) => {
       if (err) {

@@ -1,17 +1,13 @@
-import {
-  readJSONFile,
-  makeGetRequest,
-  cookiesExist,
-  writeToFile,
-} from "./utils";
+import { readJSONFile, makeGetRequest, fileExists, writeToFile } from "./utils";
 import auth from "./auth.js";
 import { differenceInSeconds } from "date-fns";
 import "dotenv/config";
 import SavedSongs from "./classes/SavedSongs";
 import SavedSong from "./classes/SavedSong";
-import { InitializeDB } from "./database/database";
+import { GetActiveCookiesFromDB, InitializeDB } from "./database/database";
 
 const apiUrl = process.env.APIURL;
+const dbPath = process.env.DBPATH;
 const timeStart = Date.now();
 let mainVariables: MainVariables = {
   cookieString: "",
@@ -20,25 +16,31 @@ let mainVariables: MainVariables = {
 };
 
 async function main() {
+  if (!apiUrl) throw new Error("API URL is null");
+  if (!dbPath) throw new Error("DB PATH is null");
   const cookiesPath = "./cookies.json";
-  let cookieExist = await cookiesExist(cookiesPath);
+  const dbExists = await fileExists(dbPath);
+  if (!dbExists) InitializeDB();
 
-  if (!cookieExist) {
+  // let cookieExist = await fileExists(cookiesPath);
+  let cookies = await GetActiveCookiesFromDB();
+  console.log("Cookies Result: ", cookies);
+
+  if (!cookies) {
     process.stdout.write("Authorization needed\n");
     await auth();
     main();
   } else {
     try {
-      if (!apiUrl) throw new Error("API URL is null");
       process.stdout.write("Cookies already exist\n");
-      let cookies = JSON.parse(
-        await readJSONFile(cookiesPath)
-      ) as CookieInterface[];
+      // let cookies = JSON.parse(
+      //   await readJSONFile(cookiesPath)
+      // ) as CookieInterface[];
       cookies.forEach((ele) => {
         mainVariables.cookieString =
           mainVariables.cookieString + `${ele.name}=${ele.value};`;
       });
-      InitializeDB();
+
       process.stdout.write("Requesting songs ...\n");
       let res = JSON.parse(
         await makeGetRequest(apiUrl, mainVariables)
@@ -95,6 +97,7 @@ async function main() {
       );
       // API rate limit documentation: https://developer.planning.center/docs/#/overview/rate-limiting
       await writeToFile(savedSongsData, "songsSavedData");
+      // await saveToDatabase(savedSongsData);
 
       process.exit();
     } catch (error: any) {
