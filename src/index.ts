@@ -4,7 +4,8 @@ import { differenceInSeconds } from "date-fns";
 import "dotenv/config";
 import SavedSongs from "./classes/SavedSongs";
 import SavedSong from "./classes/SavedSong";
-import { GetActiveCookiesFromDB, InitializeDB } from "./database/database";
+import { InitializeDB } from "./database/initializeRepo";
+import { GetActiveCookiesFromDB } from "./database/cookiesRepo";
 
 const apiUrl = process.env.APIURL;
 const dbPath = process.env.DBPATH;
@@ -16,22 +17,20 @@ let mainVariables: MainVariables = {
 };
 
 async function main() {
-  if (!apiUrl) throw new Error("API URL is null");
-  if (!dbPath) throw new Error("DB PATH is null");
-  const cookiesPath = "./cookies.json";
-  const dbExists = await fileExists(dbPath);
-  if (!dbExists) InitializeDB();
+  try {
+    if (!apiUrl) throw new Error("API URL is null");
+    if (!dbPath) throw new Error("DB PATH is null");
+    // const cookiesPath = "./cookies.json";
+    const dbExists = await fileExists(dbPath);
+    if (!dbExists) InitializeDB();
 
-  // let cookieExist = await fileExists(cookiesPath);
-  let cookies = await GetActiveCookiesFromDB();
-  console.log("Cookies Result: ", cookies);
-
-  if (!cookies) {
-    process.stdout.write("Authorization needed\n");
-    await auth();
-    main();
-  } else {
-    try {
+    // let cookieExist = await fileExists(cookiesPath);
+    let cookies = await GetActiveCookiesFromDB();
+    if (!cookies) {
+      process.stdout.write("Authorization needed\n");
+      await auth();
+      main();
+    } else {
       process.stdout.write("Cookies already exist\n");
       // let cookies = JSON.parse(
       //   await readJSONFile(cookiesPath)
@@ -100,10 +99,10 @@ async function main() {
       // await saveToDatabase(savedSongsData);
 
       process.exit();
-    } catch (error: any) {
-      process.stderr.write("There was an error in main:\n", error);
-      process.exit();
     }
+  } catch (error: any) {
+    process.stderr.write("There was an error in main:\n", error);
+    process.exit();
   }
 }
 

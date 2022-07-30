@@ -1,31 +1,14 @@
-// const sqlite3 = require("sqlite3").verbose();
 import * as sqlite from "sqlite3";
+import { AddSourceToDB } from "./sourceRepo";
+
 const sqlite3 = sqlite.verbose();
 
 const dbConnectionString = "./database.db";
 
-export async function InitializeDB() {
-  const db = new sqlite3.Database(dbConnectionString);
-
-  db.serialize(() => {
-    console.log("Database is initialized!!!");
-    db.run(`
-    CREATE TABLE cookies (
-      id INTEGER PRIMARY KEY,
-      source TEXT NOT NULL,
-      json TEXT,
-      active BOOLEAN NOT NULL,
-      date_added TEXT NOT NULL,
-      date_modified TEXT
-    )`);
-  });
-
-  db.close();
-}
-
 export async function AddCookiesToDB(cookies: CookieInterface, source: string) {
   const db = new sqlite3.Database(dbConnectionString);
   const time = new Date();
+
   const cookieSql = `
   INSERT INTO cookies(
     source,
@@ -36,8 +19,10 @@ export async function AddCookiesToDB(cookies: CookieInterface, source: string) {
     $source, $json, $active, $date_added
   )`;
 
+  const sourceInt = await AddSourceToDB(source, db);
+
   db.run(cookieSql, {
-    $source: source,
+    $source: sourceInt,
     $json: JSON.stringify(cookies),
     $active: true,
     $date_added: time.toISOString(),
@@ -48,7 +33,7 @@ export async function AddCookiesToDB(cookies: CookieInterface, source: string) {
 
 export async function GetActiveCookiesFromDB() {
   const db = new sqlite3.Database(dbConnectionString);
-  const sqlQuery = `SELECT json FROM cookies WHERE active = true`;
+  const sqlQuery = `SELECT json FROM cookies WHERE datetime() < DATETIME(json_extract(json, '$.expires'), 'unixepoch') AND active = true;`;
   try {
     const query = await new Promise((resolve, reject) => {
       db.all(sqlQuery, [], (err, result) => {
@@ -59,8 +44,7 @@ export async function GetActiveCookiesFromDB() {
       });
     }).then((result) => {
       db.close();
-      const cookieJSONResult = result as CookieJSON[];
-      return cookieJSONResult.map((ele) =>
+      return (result as CookieQueryResult[]).map((ele) =>
         JSON.parse(ele.json)
       ) as CookieInterface[];
     });
@@ -71,8 +55,4 @@ export async function GetActiveCookiesFromDB() {
   } catch (error) {
     return null;
   }
-}
-
-interface CookieJSON {
-  json: string;
 }

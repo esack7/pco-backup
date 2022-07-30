@@ -10,10 +10,10 @@
   "author": "Isaac Heist",
   "license": "MIT",
   "dependencies": {
-    "date-fns": "^2.28.0",
+    "date-fns": "^2.29.1",
     "dotenv": "^16.0.1",
-    "puppeteer": "^15.3.0",
-    "sqlite3": "^5.0.9",
+    "puppeteer": "^15.5.0",
+    "sqlite3": "^5.0.10",
     "superagent": "^8.0.0"
   },
   "devDependencies": {
