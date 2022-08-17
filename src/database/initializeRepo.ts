@@ -30,13 +30,17 @@ export async function InitializeDB() {
     CREATE TABLE songs (
       id INTEGER PRIMARY KEY,
       sourceId INTEGER NOT NULL,
-      attributes_json TEXT
+      attributes_json TEXT,
+      date_added TEXT NOT NULL,
+      date_modified TEXT
     )`);
       db.run(`
     CREATE TABLE arrangments (
       id INTEGER PRIMARY KEY,
       songId INTEGER,
-      attributes_json TEXT
+      attributes_json TEXT,
+      date_added TEXT NOT NULL,
+      date_modified TEXT
     )`);
       db.close();
     });

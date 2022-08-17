@@ -11,6 +11,7 @@ import {
   UpdateSourceJSONwithId,
   GetSourceJSONwithId,
 } from "./database/sourceRepo";
+import { AddSongToDB } from "./database/songsRepo";
 
 const apiUrl = process.env.APIURL;
 const dbPath = process.env.DBPATH;
@@ -64,6 +65,11 @@ async function main() {
         // process.stdout.write(" .");
 
         for (let i = 0; i < res.data.length; i++) {
+          await AddSongToDB(
+            parseInt(res.data[i].id),
+            mainVariables.sourceID,
+            res.data[i].attributes
+          );
           process.stdout.write(
             `Getting data for ${res.data[i].attributes.title}\n`
           );
