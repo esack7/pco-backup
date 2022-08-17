@@ -12,7 +12,7 @@ export async function InitializeDB() {
       db.run(`
     CREATE TABLE cookies (
       id INTEGER PRIMARY KEY,
-      source INTEGER NOT NULL,
+      sourceId INTEGER NOT NULL,
       json TEXT,
       active BOOLEAN NOT NULL,
       date_added TEXT NOT NULL,
@@ -24,6 +24,19 @@ export async function InitializeDB() {
       id INTEGER PRIMARY KEY,
       description TEXT UNIQUE NOT NULL,
       json TEXT
+    )`);
+
+      db.run(`
+    CREATE TABLE songs (
+      id INTEGER PRIMARY KEY,
+      sourceId INTEGER NOT NULL,
+      attributes_json TEXT
+    )`);
+      db.run(`
+    CREATE TABLE arrangments (
+      id INTEGER PRIMARY KEY,
+      songId INTEGER,
+      attributes_json TEXT
     )`);
       db.close();
     });

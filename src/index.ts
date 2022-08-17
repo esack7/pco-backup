@@ -6,6 +6,11 @@ import SavedSongs from "./classes/SavedSongs";
 import SavedSong from "./classes/SavedSong";
 import { InitializeDB } from "./database/initializeRepo";
 import { GetActiveCookiesFromDB } from "./database/cookiesRepo";
+import SourceJSON from "./classes/SourceJson";
+import {
+  UpdateSourceJSONwithId,
+  GetSourceJSONwithId,
+} from "./database/sourceRepo";
 
 const apiUrl = process.env.APIURL;
 const dbPath = process.env.DBPATH;
@@ -14,6 +19,7 @@ let mainVariables: MainVariables = {
   cookieString: "",
   callCount: 0,
   currentTime: Date.now(),
+  sourceID: 0,
 };
 
 async function main() {
@@ -25,12 +31,13 @@ async function main() {
     if (!dbExists) InitializeDB();
 
     // let cookieExist = await fileExists(cookiesPath);
-    let cookies = await GetActiveCookiesFromDB();
+    let cookies = await GetActiveCookiesFromDB(mainVariables);
     if (!cookies) {
       process.stdout.write("Authorization needed\n");
       await auth();
       main();
     } else {
+      let sourceJson = await GetSourceJSONwithId(mainVariables.sourceID);
       process.stdout.write("Cookies already exist\n");
       // let cookies = JSON.parse(
       //   await readJSONFile(cookiesPath)
@@ -44,6 +51,13 @@ async function main() {
       let res = JSON.parse(
         await makeGetRequest(apiUrl, mainVariables)
       ) as SongsRequest;
+      console.log("Step 1");
+      if (sourceJson.length === 0) {
+        console.log("Step 2");
+        sourceJson = JSON.stringify(new SourceJSON(res));
+        await UpdateSourceJSONwithId(sourceJson, mainVariables.sourceID);
+      }
+
       const savedSongsData = new SavedSongs(res);
 
       while (!!res.links.next) {

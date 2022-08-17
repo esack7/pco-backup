@@ -11,18 +11,18 @@ export async function AddCookiesToDB(cookies: CookieInterface, source: string) {
 
   const cookieSql = `
   INSERT INTO cookies(
-    source,
+    sourceId,
     json,
     active,
     date_added
   ) VALUES (
-    $source, $json, $active, $date_added
+    $sourceId, $json, $active, $date_added
   )`;
 
   const sourceInt = await AddSourceToDB(source, db);
 
   db.run(cookieSql, {
-    $source: sourceInt,
+    $sourceId: sourceInt,
     $json: JSON.stringify(cookies),
     $active: true,
     $date_added: time.toISOString(),
@@ -31,9 +31,9 @@ export async function AddCookiesToDB(cookies: CookieInterface, source: string) {
   db.close();
 }
 
-export async function GetActiveCookiesFromDB() {
+export async function GetActiveCookiesFromDB(mainVariables: MainVariables) {
   const db = new sqlite3.Database(dbConnectionString);
-  const sqlQuery = `SELECT json FROM cookies WHERE datetime() < DATETIME(json_extract(json, '$.expires'), 'unixepoch') AND active = true;`;
+  const sqlQuery = `SELECT sourceId, json FROM cookies WHERE datetime() < DATETIME(json_extract(json, '$.expires'), 'unixepoch') AND active = true;`;
   try {
     const query = await new Promise((resolve, reject) => {
       db.all(sqlQuery, [], (err, result) => {
@@ -44,7 +44,9 @@ export async function GetActiveCookiesFromDB() {
       });
     }).then((result) => {
       db.close();
-      return (result as CookieQueryResult[]).map((ele) =>
+      const cookieQueryResultArray = result as CookieQueryResult[];
+      mainVariables.sourceID = cookieQueryResultArray[0].sourceId;
+      return cookieQueryResultArray.map((ele) =>
         JSON.parse(ele.json)
       ) as CookieInterface[];
     });

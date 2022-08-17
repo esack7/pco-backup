@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
-import { readSelection, writeToFile } from "./utils.js";
-import { AddCookiesToDB } from "./database/cookiesRepo.js";
+import { readSelection, writeToFile } from "./utils";
+import { AddCookiesToDB } from "./database/cookiesRepo";
 import "dotenv/config";
 
 const username = process.env.USRNAME;
@@ -62,7 +62,7 @@ export default async function auth(): Promise<void> {
       );
     }
     await page.waitForNavigation();
-    process.stdout.write(`Collecting all cookies\n`);
+    process.stdout.write(`Collecting all cookies`);
 
     const cookies = (await page.cookies()) as CookieInterface[];
 

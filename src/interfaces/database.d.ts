@@ -1,6 +1,6 @@
 interface CookieQueryResult {
   id: number;
-  source: number;
+  sourceId: number;
   json: string;
   active: boolean;
   date_added: string;
@@ -11,4 +11,17 @@ interface SourceQueryResult {
   id: number;
   desciption: string;
   json: string;
+}
+
+interface SourceJson {
+  included: [];
+  meta: MetaJson;
+}
+
+interface MetaJson {
+  total_count: number;
+  can_include?: string[];
+  can_order_by?: string[];
+  can_query_by?: string[];
+  parent: Role;
 }
