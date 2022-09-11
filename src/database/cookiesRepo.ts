@@ -33,10 +33,24 @@ export async function AddCookiesToDB(cookies: CookieInterface, source: string) {
 
 export async function GetActiveCookiesFromDB(mainVariables: MainVariables) {
   const db = new sqlite3.Database(dbConnectionString);
-  const sqlQuery = `SELECT sourceId, json FROM cookies WHERE datetime() < DATETIME(json_extract(json, '$.expires'), 'unixepoch') AND active = true;`;
+  const time = new Date();
+
+  const selectQuery = `
+  SELECT sourceId, json FROM cookies
+  WHERE datetime() < DATETIME(json_extract(json, '$.expires'), 'unixepoch') AND active = true;`;
+
+  const updateQuery = `
+    UPDATE cookies
+    SET active = false, date_modified = $date_modified
+    WHERE datetime() > DATETIME(json_extract(json, '$.expires'), 'unixepoch') AND active = true`;
   try {
+    // Makes cookies that have expired as invalid
+    db.run(updateQuery, {
+      $date_modified: time.toISOString(),
+    });
+
     const query = await new Promise((resolve, reject) => {
-      db.all(sqlQuery, [], (err, result) => {
+      db.all(selectQuery, [], (err, result) => {
         if (err) {
           reject(err);
         }

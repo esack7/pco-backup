@@ -116,4 +116,5 @@ temp/
 *cookies.json
 *savedData*.json
 *.db
+scratch.sql
 # End of https://www.gitignore.io/api/node,dotenv

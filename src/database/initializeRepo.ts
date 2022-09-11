@@ -30,7 +30,12 @@ export async function InitializeDB() {
     CREATE TABLE songs (
       id INTEGER PRIMARY KEY,
       sourceId INTEGER NOT NULL,
-      attributes_json TEXT,
+      title TEXT NOT NULL,
+      ccli_number INTEGER UNIQUE,
+      admin TEXT,
+      author TEXT,
+      copyright TEXT,
+      themes TEXT,
       date_added TEXT NOT NULL,
       date_modified TEXT
     )`);

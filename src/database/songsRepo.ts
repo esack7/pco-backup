@@ -16,16 +16,37 @@ export async function AddSongToDB(
   INSERT INTO songs(
     id,
     sourceId,
-    attributes_json,
+    title,
+    ccli_number,
+    admin,
+    author,
+    copyright,
+    themes,
     date_added
-  ) VALUES (
-    $id, $sourceId, $attributes_json, $date_added
-  )`;
+  ) 
+  SELECT
+    $id, 
+    $sourceId, 
+    $title,
+    $ccli_number,
+    $admin,
+    $author,
+    $copyright,
+    $themes,
+    $date_added
+  WHERE NOT EXISTS
+  (SELECT * FROM songs WHERE id = $id OR ccli_number =$ccli_number)
+  `;
 
   db.run(songSql, {
     $id: id,
     $sourceId: sourceId,
-    $attributes_json: JSON.stringify(attributesJSON),
+    $title: attributesJSON.title,
+    $ccli_number: attributesJSON.ccli_number,
+    $admin: attributesJSON.admin,
+    $author: attributesJSON.author,
+    $copyright: attributesJSON.copyright,
+    $themes: attributesJSON.themes,
     $date_added: time.toISOString(),
   });
 

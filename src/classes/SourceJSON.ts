@@ -1,4 +1,4 @@
-import MetaJSON from "./MetaJson";
+import MetaJSON from "./MetaJSON";
 
 export default class SourceJSON implements SourceJson {
   included: [];

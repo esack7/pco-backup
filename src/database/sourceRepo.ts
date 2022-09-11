@@ -15,7 +15,7 @@ export async function AddSourceToDB(
     }
 
     const sourceSql = `
-      REPLACE INTO source (
+      INSERT INTO source (
         description,
         json
       ) VALUES (
@@ -23,29 +23,22 @@ export async function AddSourceToDB(
         $json
       )`;
 
-    db.run(sourceSql, {
-      $description: source,
-      $json: null,
-    });
+    let sourceID = await GetSourceIdWithDescription(source, db);
 
-    const sourceInt = await new Promise((resolve, reject) => {
-      db!.get(
-        `SELECT id FROM source WHERE description = ?`,
-        [source],
-        (err, result) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(result);
-        }
-      );
-    }).then((output) => (output as SourceQueryResult).id);
+    if (!sourceID) {
+      db.run(sourceSql, {
+        $description: source,
+        $json: null,
+      });
+
+      sourceID = await GetSourceIdWithDescription(source, db);
+    }
 
     if (dbNeedsClosed) {
       db.close();
     }
 
-    return sourceInt;
+    return sourceID;
   } catch (error) {
     console.error("Error in AddSourceToDB: ", error);
   }
@@ -87,4 +80,26 @@ export async function GetSourceJSONwithId(id: number) {
     return "";
   }
   return sourceJson;
+}
+
+async function GetSourceIdWithDescription(
+  description: string,
+  db: sqlite.Database
+) {
+  try {
+    const sourceInt = await new Promise((resolve, reject) => {
+      db!.get(
+        `SELECT id FROM source WHERE description = ?`,
+        [description],
+        (err, result) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(result);
+        }
+      );
+    }).then((output) => (output as SourceQueryResult).id);
+
+    return sourceInt;
+  } catch (error) {}
 }

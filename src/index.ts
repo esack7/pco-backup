@@ -6,7 +6,7 @@ import SavedSongs from "./classes/SavedSongs";
 import SavedSong from "./classes/SavedSong";
 import { InitializeDB } from "./database/initializeRepo";
 import { GetActiveCookiesFromDB } from "./database/cookiesRepo";
-import SourceJSON from "./classes/SourceJson";
+import SourceJSON from "./classes/SourceJSON";
 import {
   UpdateSourceJSONwithId,
   GetSourceJSONwithId,
@@ -52,9 +52,9 @@ async function main() {
       let res = JSON.parse(
         await makeGetRequest(apiUrl, mainVariables)
       ) as SongsRequest;
-      console.log("Step 1");
+      // console.log("Step 1");
       if (sourceJson.length === 0) {
-        console.log("Step 2");
+        // console.log("Step 2");
         sourceJson = JSON.stringify(new SourceJSON(res));
         await UpdateSourceJSONwithId(sourceJson, mainVariables.sourceID);
       }
@@ -64,40 +64,29 @@ async function main() {
       while (!!res.links.next) {
         // process.stdout.write(" .");
 
-        for (let i = 0; i < res.data.length; i++) {
-          await AddSongToDB(
-            parseInt(res.data[i].id),
-            mainVariables.sourceID,
-            res.data[i].attributes
-          );
-          process.stdout.write(
-            `Getting data for ${res.data[i].attributes.title}\n`
-          );
+        for (const song of res.data) {
+          const songId = parseInt(song.id);
+          const songAttributes = song.attributes;
+          const songTitle = song.attributes.title;
+          const songURL = song.links.self;
+
+          process.stdout.write(`Getting data for ${songTitle}\n`);
           const arrangements = JSON.parse(
-            await makeGetRequest(
-              `${res.data[i].links.self}/arrangements`,
-              mainVariables
-            )
+            await makeGetRequest(`${songURL}/arrangements`, mainVariables)
           ) as Arrangements;
-          // savedSongsData.data[i].arrangements = res;
 
           const attachments = JSON.parse(
-            await makeGetRequest(
-              `${res.data[i].links.self}/attachments`,
-              mainVariables
-            )
+            await makeGetRequest(`${songURL}/attachments`, mainVariables)
           ) as Attachments;
-          // savedSongsData.data[i].attachments = res;
 
           const tags = JSON.parse(
-            await makeGetRequest(
-              `${res.data[i].links.self}/tags`,
-              mainVariables
-            )
+            await makeGetRequest(`${songURL}/tags`, mainVariables)
           ) as Tags;
-          // savedSongsData.data[i].tags = res;
+
+          await AddSongToDB(songId, mainVariables.sourceID, songAttributes);
+
           savedSongsData.SetSongToSavedSongData(
-            new SavedSong(res.data[i], arrangements, attachments, tags)
+            new SavedSong(song, arrangements, attachments, tags)
           );
         }
 
