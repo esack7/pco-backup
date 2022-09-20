@@ -44,12 +44,13 @@ export default async function auth(): Promise<void> {
       }
       await Promise.all(nameOptions);
 
-      process.stdout.write(`Which account would you like to log in to:\n`);
+      process.stdout.write(
+        `For which account would you like to collect cookies:\n`
+      );
       for (let i = 0; i < nameOptions.length; i++) {
         process.stdout.write(`\t${i + 1}. ${nameOptions[i]}\n`);
       }
       process.stdout.write(`Type 1 - ${nameOptions.length}: `);
-
       selection = await readSelection();
       selectNum = parseInt(selection);
       source = nameOptions.map((str) => str.split(" ").join(""))[selectNum - 1];
@@ -62,7 +63,7 @@ export default async function auth(): Promise<void> {
       );
     }
     await page.waitForNavigation();
-    process.stdout.write(`Collecting all cookies`);
+    process.stdout.write(`Collecting all cookies . . .\n`);
 
     const cookies = (await page.cookies()) as CookieInterface[];
 

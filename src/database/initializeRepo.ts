@@ -3,11 +3,11 @@ const sqlite3 = sqlite.verbose();
 
 const dbConnectionString = "./database.db";
 
-export async function InitializeDB() {
+export async function InitializeDB(path: string) {
   try {
-    const db = new sqlite3.Database(dbConnectionString);
+    const db = new sqlite3.Database(path);
 
-    db.serialize(() => {
+    return db.serialize(() => {
       console.log("Database is initialized!!!");
       db.run(`
     CREATE TABLE cookies (

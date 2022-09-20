@@ -1,6 +1,7 @@
 interface CookieQueryResult {
   id: number;
   sourceId: number;
+  sourceDesription: string;
   json: string;
   active: boolean;
   date_added: string;

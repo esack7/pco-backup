@@ -1,4 +1,10 @@
-import { readJSONFile, makeGetRequest, fileExists, writeToFile } from "./utils";
+import {
+  readJSONFile,
+  makeGetRequest,
+  fileExists,
+  writeToFile,
+  timeout,
+} from "./utils";
 import auth from "./auth.js";
 import { differenceInSeconds } from "date-fns";
 import "dotenv/config";
@@ -27,34 +33,32 @@ async function main() {
   try {
     if (!apiUrl) throw new Error("API URL is null");
     if (!dbPath) throw new Error("DB PATH is null");
-    // const cookiesPath = "./cookies.json";
-    const dbExists = await fileExists(dbPath);
-    if (!dbExists) InitializeDB();
 
-    // let cookieExist = await fileExists(cookiesPath);
+    const dbExists = await fileExists(dbPath);
+    if (!dbExists) {
+      await Promise.all([InitializeDB(dbPath), timeout(3000)]);
+    }
+
     let cookies = await GetActiveCookiesFromDB(mainVariables);
+
     if (!cookies) {
       process.stdout.write("Authorization needed\n");
       await auth();
       main();
     } else {
       let sourceJson = await GetSourceJSONwithId(mainVariables.sourceID);
+      const cookieSelection = cookies[mainVariables.sourceID - 1];
+
       process.stdout.write("Cookies already exist\n");
-      // let cookies = JSON.parse(
-      //   await readJSONFile(cookiesPath)
-      // ) as CookieInterface[];
-      cookies.forEach((ele) => {
-        mainVariables.cookieString =
-          mainVariables.cookieString + `${ele.name}=${ele.value};`;
-      });
+
+      mainVariables.cookieString = `${cookieSelection.name}=${cookieSelection.value};`;
 
       process.stdout.write("Requesting songs ...\n");
       let res = JSON.parse(
         await makeGetRequest(apiUrl, mainVariables)
       ) as SongsRequest;
-      // console.log("Step 1");
+
       if (sourceJson.length === 0) {
-        // console.log("Step 2");
         sourceJson = JSON.stringify(new SourceJSON(res));
         await UpdateSourceJSONwithId(sourceJson, mainVariables.sourceID);
       }
@@ -62,8 +66,6 @@ async function main() {
       const savedSongsData = new SavedSongs(res);
 
       while (!!res.links.next) {
-        // process.stdout.write(" .");
-
         for (const song of res.data) {
           const songId = parseInt(song.id);
           const songAttributes = song.attributes;
@@ -91,10 +93,7 @@ async function main() {
         }
 
         res = JSON.parse(await makeGetRequest(res.links.next, mainVariables));
-        // savedSongsData.data = savedSongsData.data.concat(res.data);
       }
-
-      // process.stdout.write("\n");
 
       process.stdout.write(
         `\nThere have been an average of ${
@@ -105,7 +104,6 @@ async function main() {
       );
       // API rate limit documentation: https://developer.planning.center/docs/#/overview/rate-limiting
       await writeToFile(savedSongsData, "songsSavedData");
-      // await saveToDatabase(savedSongsData);
 
       process.exit();
     }

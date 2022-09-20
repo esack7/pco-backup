@@ -2,12 +2,12 @@ import { writeFile, readFile, access, constants } from "fs";
 import { get } from "superagent";
 import { createInterface } from "readline";
 
-const reader = createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
 export function readSelection(): Promise<string> {
+  const reader = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
   return new Promise((resolve, reject) => {
     reader.on("line", (input) => {
       reader.close();
@@ -63,4 +63,7 @@ export function fileExists(path: string) {
       resolve(true);
     });
   });
+}
+export function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
