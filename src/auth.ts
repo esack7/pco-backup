@@ -63,7 +63,7 @@ export default async function auth(): Promise<void> {
       );
     }
     await page.waitForNavigation();
-    process.stdout.write(`Collecting all cookies . . .\n`);
+    process.stdout.write(`Collecting all cookies . . .`);
 
     const cookies = (await page.cookies()) as CookieInterface[];
 

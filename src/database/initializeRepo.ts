@@ -40,12 +40,12 @@ export async function InitializeDB(path: string) {
       date_modified TEXT
     )`);
       db.run(`
-    CREATE TABLE arrangments (
+    CREATE TABLE arrangements (
       id INTEGER PRIMARY KEY,
+      name TEXT,
       songId INTEGER,
       attributes_json TEXT,
-      date_added TEXT NOT NULL,
-      date_modified TEXT
+      date_added TEXT NOT NULL
     )`);
       db.close();
     });

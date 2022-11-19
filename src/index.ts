@@ -18,6 +18,7 @@ import {
   GetSourceJSONwithId,
 } from "./database/sourceRepo";
 import { AddSongToDB } from "./database/songsRepo";
+import { AddSongArrangementsToDB } from "./database/arrangementsRepo";
 
 const apiUrl = process.env.APIURL;
 const dbPath = process.env.DBPATH;
@@ -59,6 +60,7 @@ async function main() {
       ) as SongsRequest;
 
       if (sourceJson.length === 0) {
+        // Source JSON is set here
         sourceJson = JSON.stringify(new SourceJSON(res));
         await UpdateSourceJSONwithId(sourceJson, mainVariables.sourceID);
       }
@@ -86,6 +88,8 @@ async function main() {
           ) as Tags;
 
           await AddSongToDB(songId, mainVariables.sourceID, songAttributes);
+
+          await AddSongArrangementsToDB(arrangements.data, songId);
 
           savedSongsData.SetSongToSavedSongData(
             new SavedSong(song, arrangements, attachments, tags)
