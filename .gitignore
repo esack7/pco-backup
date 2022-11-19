@@ -117,4 +117,5 @@ temp/
 *savedData*.json
 *.db
 scratch.*
+*.csv
 # End of https://www.gitignore.io/api/node,dotenv

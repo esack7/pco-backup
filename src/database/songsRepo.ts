@@ -34,8 +34,6 @@ export async function AddSongToDB(
     $copyright,
     $themes,
     $date_added
-  WHERE NOT EXISTS
-  (SELECT * FROM songs WHERE id = $id OR ccli_number =$ccli_number)
   `;
 
   db.run(songSql, {
