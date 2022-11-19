@@ -31,7 +31,7 @@ export async function InitializeDB(path: string) {
       id INTEGER PRIMARY KEY,
       sourceId INTEGER NOT NULL,
       title TEXT NOT NULL,
-      ccli_number INTEGER UNIQUE,
+      ccli_number INTEGER,
       admin TEXT,
       author TEXT,
       copyright TEXT,
