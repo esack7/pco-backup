@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
-import { readSelection, writeToFile } from "./utils.js";
+import { readSelection, writeToFile } from "./utils";
+import { AddCookiesToDB } from "./database/cookiesRepo";
 import "dotenv/config";
 
 const username = process.env.USRNAME;
@@ -7,12 +8,13 @@ const password = process.env.PSWORD;
 const loginURL = process.env.LOGINURL;
 
 export default async function auth(): Promise<void> {
+  const browser = await puppeteer.launch({ headless: false });
   try {
     if (!username) throw new Error("User name is null.");
     if (!password) throw new Error("Password is null.");
     if (!loginURL) throw new Error("Login URL is null.");
 
-    const browser = await puppeteer.launch({ headless: false });
+    let source = "";
     const pages = await browser.pages();
 
     process.stdout.write(`Logging in.\n`);
@@ -24,16 +26,14 @@ export default async function auth(): Promise<void> {
     await page.type("#password", password);
 
     page.waitForSelector('input[type="submit"]');
-    // await page.waitFor(30000);
     await page.click('input[type="submit"]');
     let currentURL = await page.mainFrame().url();
-
     if (currentURL === loginURL) {
       let nameOptions = [];
       let selection = "";
       let selectNum = 0;
       let listOptions = await page.$$('div[data-ref="login-button"] h2');
-      // console.log("List Options: ", listOptions);
+
       for (let i = 0; i < listOptions.length; i++) {
         if (!listOptions) throw new Error("Acccount option is null");
         let name = await page.evaluate(
@@ -44,17 +44,17 @@ export default async function auth(): Promise<void> {
       }
       await Promise.all(nameOptions);
 
-      process.stdout.write(`Which account would you like to log in to:\n`);
+      process.stdout.write(
+        `For which account would you like to collect cookies:\n`
+      );
       for (let i = 0; i < nameOptions.length; i++) {
         process.stdout.write(`\t${i + 1}. ${nameOptions[i]}\n`);
       }
       process.stdout.write(`Type 1 - ${nameOptions.length}: `);
-
       selection = await readSelection();
       selectNum = parseInt(selection);
-
+      source = nameOptions.map((str) => str.split(" ").join(""))[selectNum - 1];
       //TODO: Add validation.
-      // await page.click(`li:nth-child(${selectNum}) > a.f-1`);
       await page.click(
         `div[data-ref="login-button"]:nth-child(${selectNum}) > a.btn`
       );
@@ -63,12 +63,14 @@ export default async function auth(): Promise<void> {
       );
     }
     await page.waitForNavigation();
-    process.stdout.write(`Collecting all cookies`);
+    process.stdout.write(`Collecting all cookies . . .`);
 
-    const cookies = await page.cookies();
+    const cookies = (await page.cookies()) as CookieInterface[];
 
     process.stdout.write(` Cookies collected!\n`);
-    await writeToFile(cookies, "cookies");
+    await AddCookiesToDB(cookies[0], source);
+    // await writeToFile(cookies, "cookies");
+    await browser.close();
   } catch (error) {
     console.error(
       "There has been an error in auth.js\nHere is the error:\n",
