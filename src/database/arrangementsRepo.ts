@@ -12,7 +12,7 @@ export async function AddSongArrangementsToDB(
     const time = new Date();
 
     const arrangementSql = `
-    INSERT INTO arrangements(
+    INSERT OR REPLACE INTO arrangements(
         id,
         name,
         songId,

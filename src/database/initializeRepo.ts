@@ -10,16 +10,6 @@ export async function InitializeDB(path: string) {
     return db.serialize(() => {
       console.log("Database is initialized!!!");
       db.run(`
-    CREATE TABLE cookies (
-      id INTEGER PRIMARY KEY,
-      sourceId INTEGER NOT NULL,
-      json TEXT,
-      active BOOLEAN NOT NULL,
-      date_added TEXT NOT NULL,
-      date_modified TEXT
-    )`);
-
-      db.run(`
     CREATE TABLE source (
       id INTEGER PRIMARY KEY,
       description TEXT UNIQUE NOT NULL,
