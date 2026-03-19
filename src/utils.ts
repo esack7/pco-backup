@@ -39,13 +39,18 @@ export function readJSONFile(path: string) {
     });
   });
 }
+/** PCO allows ~100 requests per 20 seconds. Throttle to ~5/sec to stay under. */
+const RATE_LIMIT_DELAY_MS = 210;
+
 export function makeGetRequest(postURL: string, mainVariables: MainVariables) {
   return new Promise<string>((resolve, reject) => {
     get(postURL)
-      .set("Cookie", mainVariables.cookieString)
-      .then((res) => {
+      .set("Authorization", mainVariables.authHeaders.Authorization)
+      .set("User-Agent", mainVariables.authHeaders["User-Agent"])
+      .then(async (res) => {
         mainVariables.callCount++;
         mainVariables.currentTime = Date.now();
+        await timeout(RATE_LIMIT_DELAY_MS);
         resolve(JSON.stringify(res.body));
       })
       .catch((err) => {

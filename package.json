@@ -10,14 +10,13 @@
   "author": "Isaac Heist",
   "license": "MIT",
   "dependencies": {
-    "date-fns": "^2.29.1",
-    "dotenv": "^16.0.1",
-    "puppeteer": "^15.5.0",
-    "sqlite3": "^5.0.10",
-    "superagent": "^8.0.0"
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.3.1",
+    "sqlite3": "^6.0.1",
+    "superagent": "^10.3.0"
   },
   "devDependencies": {
-    "@types/sqlite3": "^3.1.8",
-    "@types/superagent": "^4.1.15"
+    "@types/superagent": "^8.1.9",
+    "typescript": "^5.9.3"
   }
 }

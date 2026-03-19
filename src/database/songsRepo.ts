@@ -13,7 +13,7 @@ export async function AddSongToDB(
   const time = new Date();
 
   const songSql = `
-  INSERT INTO songs(
+  INSERT OR REPLACE INTO songs(
     id,
     sourceId,
     title,

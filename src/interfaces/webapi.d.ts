@@ -1,19 +1,3 @@
-interface CookieInterface {
-  name: string;
-  value: string;
-  domain: string;
-  path: string;
-  expires: number;
-  size: number;
-  httpOnly: boolean;
-  secure: boolean;
-  session: boolean;
-  sameSite: string;
-  sameParty: boolean;
-  sourceScheme: string;
-  sourcePort: number;
-}
-
 interface Links {
   self: string;
   next?: string;
